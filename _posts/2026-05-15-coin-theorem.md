@@ -53,6 +53,7 @@ $$
 We circle back to the same question:
 
 >While figuring out which of these choices is optimal, how do we also minimize the loss we bear due to non-optimal (other) choices?
+{: .prompt-warning}
 
 
 Since the agent does not know the conversion rate, it must use the empirical estimate: CR among users served until now as a proxy to evaluate which model is better. Naturally, in order to be sure about these estimates, the agent needs to serve recommendations from every model sufficiently many times, so the empirical estimates are very likely to be near the true CR value. As such, the agent needs to balance the urge to only choose the action with the best estimate (exploitation) and the urge to improve the quality of the estimates by trying out all choices (exploration). This is called the exploration-exploitation dilemma. Finally, based on how sure the agent is about the estimates, it can dial down how often it serves users with recommendations from suboptimal models.
