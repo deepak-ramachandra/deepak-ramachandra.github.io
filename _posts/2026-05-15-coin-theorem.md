@@ -4,16 +4,19 @@ date: 2026-05-15
 categories: [Math]
 tags: [theorem]
 math: true
+image:
+    path: /assets/img/IMG_5832_sq.jpeg
+    alt: Every once in a while, in a period of time that feels long and filled with exhaustion, though very rarely, you might see something like this. Just thinking about it gets your heart racing, and you can feel your confidence coming back. After a long and strenuous climb to the top, it serves as the foothold that you desperately needed. It is not a miracle, maybe it's one out of a hundred, or even one out of a thousand, but it's the one you went to reach and managed to grab. By grabbing and connecting these rare moments, you are able to keep climbing higher and higher.— Fuki Hibarida, (Haikyuu!!)
 ---
-
+<!--
 <blockquote>
 Every once in a while, in a period of time that feels long and filled with exhaustion, though very rarely, you might see something like this. Just thinking about it gets your heart racing, and you can feel your confidence coming back. After a long and strenuous climb to the top, it serves as the foothold that you desperately needed. It is not a miracle, maybe it's one out of a hundred, or even one out of a thousand, but it's the one you went to reach and managed to grab. By grabbing and connecting these rare moments, you are able to keep climbing higher and higher.
 <div style="text-align:right">— Fuki Hibarida, <strong>Haikyuu!!</strong></div>
-</blockquote>
+</blockquote> -->
 
 My Master's thesis was about proving the [Differential Privacy]({% post_url 2026-05-16-differential-privacy %}) of Thompson Sampling[^agrawal2017] for two arm bandits. Calculating expectations of random variables was well known to me, but the progression of my Master's thesis demanded from me the skill of proving high probability bounds, which in turn demanded a deeper knowledge of the underlying distribution.
 
-While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. Looking back in my scratches, I find that the key result that solidified my intuition won't make it into my final draft. I have submitted the full work to [Neurips 2026](https://neurips.cc/) and awaiting acceptance. I plan to link it here soon. Unlike the many rare footholds I managed to grab that contributed to the final result, this one finds its place here in the post. The inspiration and the theory of the Coin Theorem is developed here.
+While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. Looking back in my scratches, I find that the key result that solidified my intuition won't make it into my final draft. I have submitted the full work to [Neurips 2026](https://neurips.cc/) and awaiting a decision. I plan to link it here soon. Unlike the many rare footholds I managed to grab that contributed to the final result, this one finds its place here in the post. The inspiration and the theory of the Coin Theorem is developed here.
 
 
 ## Background

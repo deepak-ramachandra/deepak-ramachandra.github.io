@@ -4,6 +4,9 @@ date: 2026-05-16
 categories: [Math]
 tags: [differential-privacy, statistics, hypothesis-testing]
 math: true
+image:
+    path: /assets/img/gdp_delta_regimes.png
+    alt: Plotting δ against the normalized ε/η², the curves stay near 1 in the vacuous regime (ε ≤ η²/4), drop through the transition, and become negligible by ε ≥ η².
 ---
 
 ### Statement

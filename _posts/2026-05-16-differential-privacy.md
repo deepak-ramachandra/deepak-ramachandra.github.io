@@ -6,7 +6,10 @@ tags: [differential-privacy, statistics]
 math: true
 ---
 
-## Motivation
+(Coming soon)
+
+
+<!-- ## Motivation
 
 A plethora of algorithms extract invaluable insights from vast amounts of data. But releasing even anonymized data has repeatedly proven dangerous.
 
@@ -142,4 +145,4 @@ This square-root improvement is significant in practice and motivates the GDP co
 
 [^narayanan2008]: Narayanan, A. and Shmatikoff, V. (2008). Robust De-anonymization of Large Sparse Datasets. *IEEE Symposium on Security and Privacy*. [https://ieeexplore.ieee.org/document/4531148](https://ieeexplore.ieee.org/document/4531148)
 
-[^aol2006]: Barbaro, M. and Zeller, T. (2006). A Face Is Exposed for AOL Searcher No. 4417749. *The New York Times*. [https://www.nytimes.com/2006/08/09/technology/09aol.html](https://www.nytimes.com/2006/08/09/technology/09aol.html)
+[^aol2006]: Barbaro, M. and Zeller, T. (2006). A Face Is Exposed for AOL Searcher No. 4417749. *The New York Times*. [https://www.nytimes.com/2006/08/09/technology/09aol.html](https://www.nytimes.com/2006/08/09/technology/09aol.html) -->
