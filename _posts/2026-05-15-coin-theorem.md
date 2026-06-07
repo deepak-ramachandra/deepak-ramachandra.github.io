@@ -292,7 +292,7 @@ Setting $k = \log(1/\delta)/p$, we get the required result.
 ---
 
 >However, what if the bias (although predictable) was changing with time? This precisely describes our problem: playing arm 1 modeled as tossing tails and playing arm 2 as tossing heads. The score is the total accumulated bias throughout this run. The freedom to consider any reward sequence is modeled as the freedom to choose the bias of the coin before every toss.
-{: .prompt-warning}
+{: .prompt-info}
 
 
 ## Game
