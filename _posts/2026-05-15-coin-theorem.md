@@ -82,31 +82,19 @@ $$\mu_a \sim \mathcal{N}\!\left(\hat{\mu}_a(t-1),\, \frac{1}{n_a(t-1)+1}\right)$
 
 With this, TS samples $\theta(t)$ from this above distribution, and plays the arm with the highest $\theta_a$. The randomness in sampling naturally gives rise to exploration.
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pseudocode@2.4.1/build/pseudocode.min.css">
 
-<pre id="algo-ts" style="display:none">
-\begin{algorithm}
-\caption{Thompson Sampling with Gaussian Priors}
-\begin{algorithmic}
-\STATE \textbf{Initialize:} For each arm $a = 1, \ldots, N$, set $n_a(0)=0$, $\hat{\mu}_a(0) = 0$.
-\FOR{$t = 1, 2, \ldots, T$}
-    \FOR{each arm $a = 1, \ldots, N$}
-        \STATE Sample $\theta_a(t) \sim \mathcal{N}\!\left(\hat{\mu}_a(t-1),\, \frac{1}{n_a(t-1)+1}\right)$
-    \ENDFOR
-    \STATE Play $A_t \in \arg\max_a\, \theta_a(t)$, observe reward $r_t$
-    \STATE $\hat{\mu}_{A_t}(t) \leftarrow \dfrac{\hat{\mu}_{A_t}(t-1)\,(n_{A_t}(t-1)+1)+r_t}{n_{A_t}(t-1)+2}$
-    \STATE $n_{A_t}(t) \leftarrow n_{A_t}(t-1)+1$
-\ENDFOR
-\end{algorithmic}
-\end{algorithm}
-</pre>
 
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pseudocode@2.4.1/build/pseudocode.min.js"></script>
-<script>
-  pseudocode.renderElement(document.getElementById("algo-ts"), { lineNumber: true });
-</script>
+>**Thompson Sampling with Gaussian Priors**<br>
+>**Initialize:** For each arm $a = 1, \ldots, N$, set $n_a(0)=0$, $$\hat{\mu}_a(0) = 0$$ . <br>
+>**for** $t = 1, 2, \ldots, T$ **do**<br>
+>&emsp;**for** each arm $a = 1, \ldots, N$ **do**<br>
+>&emsp;&emsp;Sample $$\theta_a(t) \sim \mathcal{N}\left(\hat{\mu}_a(t-1),\, \frac{1}{n_a(t-1)+1}\right)$$ <br>
+>&emsp;**end for**<br>
+>&emsp;Play $$A_t \in \arg\max_a\, \theta_a(t)$$, observe reward $$r_t$$ <br>
+>&emsp; $$\hat{\mu}_{A_t}(t) \leftarrow \dfrac{\hat{\mu}_{A_t}(t-1)\,(n_{A_t}(t-1)+1)+r_t}{n_{A_t}(t-1)+2}$$ <br>
+>&emsp; $n_{A_t}(t) \leftarrow n_{A_t}(t-1)+1$<br>
+>**end for**
+{: .prompt-tip}
 
 An arm is likely to be played if it has a large $\hat\mu_a$, or a small $n_a$ (due to high standard deviation, the sampled $\theta_a$ could be larger regardless of $\hat\mu_a$).
 
