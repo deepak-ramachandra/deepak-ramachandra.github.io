@@ -136,7 +136,7 @@ $$
 $$
 
 
-### Setup
+## Setup
 For the two-arm bandit case, my method involved exploiting the closed form probabilities of TS to analytically bound the privacy loss random variable. Since the algorithm operates sequentially, we can write the privacy loss as a sum via the chain rule:
 
 $$\mathcal{L}_{R,R^\prime} = \sum_{t \leq T}\log\frac{\p_R(A_t|A_{1:t-1})}{\p_{R^\prime}(A_t|A_{1:t-1})}$$
@@ -178,7 +178,10 @@ $$
 \end{align*}
 $$
 
-Note that $n_1,n_2$ and $k$ depend only on the action sequence $a_{1:t}$ and not on the rewards. Suppose at time $t^\prime$, we played arm 2 and its reward was changed, $\p_R$ and $\p_{R^\prime}$ would differ only because of their corresponding $\hat\Delta$. Bounding involved working with many cases. The worst one is presented here.  $\hat\Delta$s would differ by at most $1/(n_2(t-1) + 1)$ at every time $t$. Also, suppose from now onwards, $\sqrt{k}\hat\Delta > 1$. That is, arm 1 has a greater chance of getting played under $\p_R$. The privacy loss can be upper bounded:
+Note that $n_1,n_2$ and $k$ depend only on the action sequence $a_{1:t}$ and not on the rewards.
+
+## The Crux of the Climb
+Suppose at time $t^\prime$, we played arm 2 and its reward was changed, $\p_R$ and $\p_{R^\prime}$ would differ only because of their corresponding $\hat\Delta$. Bounding involved working with many cases. The worst one is presented here.  $\hat\Delta$s would differ by at most $1/(n_2(t-1) + 1)$ at every time $t$. Also, suppose from now onwards, $\sqrt{k}\hat\Delta > 1$. That is, arm 1 has a greater chance of getting played under $\p_R$. The privacy loss can be upper bounded:
 
 
 $$
@@ -217,27 +220,59 @@ $$
 \sum_{t \leq T} \left(\frac{\I(A_t=1)}{\sqrt{n_2(t-1) + 1}}\right) f(t) = \sum_{j=1}^{n_2(T)} \frac{1}{\sqrt{j + 1}}\left(\sum_{t=\tau_j}^{\tau_{j+1} - 1}\I(A_t=1)f(t)\right)
 $$
 
-With $n_2(T) \leq T$, we have
+
+Define
+
+$$Y(j) = \sum_{t=\tau_j}^{\tau_{j+1} - 1}\I(A_t=1)f(t)$$
+
+With $n_2(T) \leq T$, we end up with
 
 $$
 \begin{equation}\label{eq:loss}
-\mathcal{L}_{R,R^\prime} \leq 2\sqrt{T\log(T/\delta)} + \sum_{j=1}^{T} \frac{1}{\sqrt{j + 1}}\left(\sum_{t=\tau_j}^{\tau_{j+1} - 1}\I(A_t=1)f(t)\right)
+\mathcal{L}_{R,R^\prime} \leq 2\sqrt{T\log(T/\delta)} + \sum_{j=1}^{T} \frac{Y(j)}{\sqrt{j + 1}}
 \end{equation}
 $$
 
-<div>
-Essentially, we are incurring a privacy loss of $\frac{1}{\sqrt{j + 1}}\left(\sum_{t=\tau_j}^{\tau_{j+1} - 1}\I(A_t=1)f(t)\right)$ between the two plays of arm 2. The denominator does not advance until the second arm (whose probability is low) is played. In the worst case the second arm is almost never played and we might end up with a trivial upper bound of $\mathcal{O}(T)$. I figured the only way to bound this sum was to factor $\p_R(A_t=2\mid a_{1:t-1})$ from $f$. Then, for example, in expectation, if I toss a fair coin, I should get heads in two tries or about $\frac{1}{b}$ tries if the coin had bias $b$. I hoped to show that the sum $\sum_{t=\tau_j}^{\tau_{j+1} - 1}\p(A_t=2|A_{1:t-1})$ would be bounded by some function of $\delta$.
-<br>
-Most of the work poured into the main proof involved different approaches and iterations. Among many pages of scratches, the theorem developed in this post sat close to my heart. This is the first high probability bound I ever formulated and worked on. This result turned out to provide a valid, illustrative, intermediate goal that gave me the confidence for the development of the algebra of my thesis.  Unfortunately, it will not make it into the final draft, but it finds its place on the web. My original proof exploits a key pattern in the game, whereas Claude Code gave a totally different, slick proof and hopefully a great read. The following lemma is not used in the theorem, but serves as inspiration.
-<br>
-First, we try for the case when the $\p(A_t=2|A_{1:t-1}) = p$ is fixed throughout. Then $\sum_{t=\tau_j}^{\tau_{j+1} - 1}\p(A_t=2|A_{1:t-1}) \sim \mathrm{Geom}(p)$.
-</div>
+Essentially, we are incurring a privacy loss of $Y(j)$ between the two plays of arm 2. The denominator does not advance until the second arm (whose probability is low) is played. In the worst case the second arm is almost never played and we might end up with a trivial upper bound of $\mathcal{O}(T)$.
 
----
+<blockquote class="prompt-warning">
+By reverse engineering, it is quite clear that if I show
+
+$$\forall j \in [T],\quad Y(j) \leq \sqrt{\log(T/\delta)}\quad\text{w.p.}\quad1-\delta,$$
+
+I could obtain
+
+$$\mathcal{L}_{R,R^\prime} = \mathcal{O}\left(\sqrt{T\log(T/\delta)}\right)\quad\text{w.p.}\quad1-\delta,$$
+
+The goal now becomes to obtain a (sqrt of) logarithmic bound on every Y.
+</blockquote>
+
+
+## Conjuring an image of happiness
+For the suboptimal arm 2, its probability of playing is low as per Thompson Sampling. As we go towards the end of the time horizon $T$, its probability will be negligible. Given that $Y = \sum_{\tau_j}^{\tau_{j+1}} I(A_t=1)f(t)$, we continue with unravelling $f(t)$ with the condition that $A_t=1$:
+
+$$
+\begin{align*}
+    I(A_t=1)f(t) &= \frac{\phi(\sqrt{k}\hat\Delta)}{\p(A_t=1|A_{1:t-1})}\\
+    &\leq 2\;\phi(\sqrt{k}\hat\Delta)\\
+    &\propto \Phi(-\sqrt{k}\hat\Delta) = \p(A_t=2|A_{1:t-1})
+\end{align*}
+$$
+
+The proportionality follows from the Mill's inequality, which states that the density and the cdf are closely related to each other for a normal distribution.
+
+>About, $Y(j) := \sum_{\tau_j}^{\tau_{j+1}} I(A_t=1)f(t)$, we conjecture two things about $f(t)$ when $A_t=1$.
+>1. <p>$f(t) \propto P(A_t=2|A_{1:t-1})$</p>
+>2. <p>$\sum_{\tau_j}^{\tau_{j+1}} I(A_t=1)P(A_t=2|A_{1:t-1}) \leq \sqrt{\log(T/\delta)}\quad\text{w.p.}\quad1-\delta$</p>
+{: .prompt-warning }
+
+## Outlines
+<div>I worked my way backwards. I did not want to work on the first conjecture unless I proved the second anyways. We first try for the case when the $\p(A_t=2|A_{1:t-1}) = p$ is fixed throughout. Then $\sum_{t=\tau_j}^{\tau_{j+1} - 1}\p(A_t=2|A_{1:t-1}) \sim \mathrm{Geom}(p)$. The following lemma is not used in the main result of this post, but serves as inspiration.</div>
+
 >**Lemma 1:** Let $X_1, X_2, \ldots \overset{\text{iid}}{\sim} \mathrm{Bernoulli}(p)$ with $p \in (0,1)$, and let $\tau = \min\\{k : X_k = 1\\}$ be the first time we toss a success. Then
 >
 >$$p\tau< \log(1/\delta)\quad\text{w.p.}\quad 1 - \delta.$$
-
+{: .prompt-info }
 
 **Proof.**
 Since the tosses are iid,
@@ -256,12 +291,13 @@ Setting $k = \log(1/\delta)/p$, we get the required result.
 
 ---
 
-However, what if the bias (although predictable) was changing with time? This precisely describes our problem: playing arm 1 modeled as tossing tails and playing arm 2 as tossing heads. The score is the total accumulated bias throughout this run. The freedom to consider any reward sequence is modeled as the freedom to choose the bias of the coin before every toss.
-
----
+>However, what if the bias (although predictable) was changing with time? This precisely describes our problem: playing arm 1 modeled as tossing tails and playing arm 2 as tossing heads. The score is the total accumulated bias throughout this run. The freedom to consider any reward sequence is modeled as the freedom to choose the bias of the coin before every toss.
+{: .prompt-warning}
 
 
 ## Game
+
+Most of the work poured into the main proof involved different approaches and iterations. Among many pages of scratches, the theorem developed in this post sat close to my heart. This is the first high probability bound I ever formulated and worked on. This result turned out to provide a valid, illustrative, intermediate goal that gave me the confidence for the development of the algebra of my thesis.  Unfortunately, it will not make it into the final draft, but it finds its place on the web. My original proof exploits a key pattern in the game, whereas Claude Code gave a totally different, slick proof and hopefully a great read.
 Suppose you are given the liberty to set the bias of coin to whatever value $b_t \in (0,1)$ before you toss it. Every time you toss a tail, you get some score. However, if you toss a head, the game is over. The score you get is equal to the bias $b_t$ of the coin you just tossed.
 
 Let $\tau$ be the first time we toss heads. That is, we toss this coin $\tau$ times.
@@ -277,7 +313,7 @@ So if you choose to be greedy and set the bias of the coin to be $>0.5$, you wil
 
 ## Theorem
 
-<blockquote>
+<blockquote class="prompt-info">
 <strong>Theorem (Coin).</strong> Suppose we have a coin that changes its bias every time it is tossed. Let $X_t=1$ if the toss at time $t$ results in heads and $X_t=0$ if tails, and let $\mathcal{F}_t = \sigma(X_1, \ldots, X_t)$ be the natural filtration. Define $b_t$ as the conditional probability of heads given the past:
 $$b_t \coloneqq \p(X_t=1 \mid \mathcal{F}_{t-1})$$ and assume $b_t \in (0,1)$ almost surely. Then, for any $\delta \in (0, 1)$, as per the above definitions:
 
