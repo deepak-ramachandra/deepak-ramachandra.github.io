@@ -8,11 +8,6 @@ image:
     path: /assets/img/IMG_5832_sq.jpeg
     alt: Every once in a while, in a period of time that feels long and filled with exhaustion, though very rarely, you might see something like this. Just thinking about it gets your heart racing, and you can feel your confidence coming back. After a long and strenuous climb to the top, it serves as the foothold that you desperately needed. It is not a miracle, maybe it's one out of a hundred, or even one out of a thousand, but it's the one you went to reach and managed to grab. By grabbing and connecting these rare moments, you are able to keep climbing higher and higher.— Fuki Hibarida, (Haikyuu!!)
 ---
-<!--
-<blockquote>
-Every once in a while, in a period of time that feels long and filled with exhaustion, though very rarely, you might see something like this. Just thinking about it gets your heart racing, and you can feel your confidence coming back. After a long and strenuous climb to the top, it serves as the foothold that you desperately needed. It is not a miracle, maybe it's one out of a hundred, or even one out of a thousand, but it's the one you went to reach and managed to grab. By grabbing and connecting these rare moments, you are able to keep climbing higher and higher.
-<div style="text-align:right">— Fuki Hibarida, <strong>Haikyuu!!</strong></div>
-</blockquote> -->
 
 My Master's thesis was about proving the [Differential Privacy]({% post_url 2026-05-16-differential-privacy %}) of Thompson Sampling[^agrawal2017] for two arm bandits. Calculating expectations of random variables was well known to me, but the progression of my Master's thesis demanded from me the skill of proving high probability bounds, which in turn demanded a deeper knowledge of the underlying distribution.
 
@@ -100,16 +95,18 @@ An arm is likely to be played if it has a large $\hat\mu_a$, or a small $n_a$ (d
 
 The original project [^yadav2022] I was a part of at MakeMyTrip used a Contextual Bandits version of TS. It led to a 1.5%-2% lift in overall conversion, but more importantly 20% lift for cases where the searched hotel was sold out, since it was better at recommending alternatives.
 
-During 2024, I came to Columbia University for my Master's with hopes of starting research in Safe Reinforcement Learning. My intention was to work in theoretical research so I could solidify my mathematical intuition before I set foot in anything empirical. Since I was starting with fundamentals in RL, it was natural with my prior experience to start with bandits, and with Prof. Agrawal. I proposed to work with her on a project with the goal of solving the open problem on the complexity of Joint Differential Privacy in linear contextual bandits[^azize2024]. After exploring this problem, I took up studying the differential privacy of Thompson Sampling for the two arm bandit case as my Master's Thesis. Thus, I began my journey of Safe RL research.
+I came to Columbia with the sole intention of starting research in Safe Reinforcement Learning. My plan was to start with theoretical research to solidify my mathematical intuition before setting foot in anything empirical. Since I believe in starting with fundamentals, and given my background in bandits I sought out Prof. Agrawal's guidance. I proposed to work with her on a project with the goal of solving the open problem on the complexity of Joint Differential Privacy in linear contextual bandits[^azize2024]. After exploring this problem as a part of the course project, she generously agreed to advise my Master's Thesis. I took up the studying the differential privacy of Thompson Sampling for the two arm bandit setting. This is how I began my journey of Safe RL research.
 
 ### Differential Privacy
 Differential Privacy (DP) is a property of any randomized algorithm that takes a database with every row corresponding to one user's data as input. The extent of privacy is governed by the extent to which output distribution can change when one user's data is replaced or omitted. In a two-armed bandit setting with finite horizon $T$, without loss of generality, we can consider the rewards to be pre-sampled and the algorithm to sequentially process them. Thus rewards can be considered to be the input and the actions can be considered as random outputs.
 
-For the current setting, two reward sequences $R, R^\prime \in [0,1]^{T\times2}$ are called neighboring if and only if they differ at exactly one time step $t \in [T]$. Fixing the input reward sequence $R \in [0,1]^{T\times2}$, the algorithm outputs a random action sequence $a_{1:T} \in \Omega$, and we denote the resulting categorical distribution over $\Omega = \\{1,2\\}^T$ by $\p_R(\;\cdot\;)$. If instead we set the input to $R^\prime$, the same sample space $\Omega = \\{1,2\\}^T$ is measured by a different law $\p_{R^\prime}(\;\cdot\;)$. TS would be called $(\epsilon,\delta)$-DP if and only if, for every pair of neighboring reward sequences $R,R^\prime$ and every action sequence $a_{1:T} \in \Omega$:
+For the current setting, two reward sequences $R, R^\prime \in [0,1]^{T\times2}$ are called neighboring if and only if they differ at exactly one time step $t \in [T]$. Fixing the input reward sequence $R \in [0,1]^{T\times2}$, the algorithm outputs a random action sequence $a_{1:T} \in \Omega$, and we denote the resulting categorical distribution over $\Omega = \\{1,2\\}^T$ by $\p_R(\;\cdot\;)$. If instead we set the input to $R^\prime$, the same sample space $\Omega = \\{1,2\\}^T$ is measured by a different law $\p_{R^\prime}(\;\cdot\;)$.
 
-$$
-\p_{R}(A_{1:T} = a_{1:T}) \leq e^\epsilon\;\p_{R^\prime}(A_{1:T} = a_{1:T}) + \delta
-$$
+
+>Thompson Sampling would be called $(\epsilon,\delta)$-DP if and only if, for every pair of neighboring reward sequences $R,R^\prime$ and every action sequence $a_{1:T} \in \Omega$:
+>
+> $$\p_{R}(A_{1:T} = a_{1:T}) \leq e^\epsilon\;\p_{R^\prime}(A_{1:T} = a_{1:T}) + \delta$$
+{: .prompt-tip}
 
 We show that showing a high probability bound on privacy loss is a sufficient condition in [another post]({% post_url 2026-05-16-differential-privacy %}). Essentially, we define privacy loss function:
 
