@@ -90,7 +90,7 @@ With this, TS samples $\theta(t)$ from this above distribution, and plays the ar
 >&emsp;**for** each arm $a = 1, \ldots, N$ **do**<br>
 >&emsp;&emsp;Sample $$\theta_a(t) \sim \mathcal{N}\left(\hat{\mu}_a(t-1),\, \frac{1}{n_a(t-1)+1}\right)$$ <br>
 >&emsp;**end for**<br>
->&emsp;Play $$A_t \in \arg\max_a\, \theta_a(t)$$, observe reward $$r_t$$ <br>
+>&emsp;Play $$A_t \in \mathrm{Argmax}_a\, \theta_a(t)$$, observe reward $$r_t$$ <br>
 >&emsp; $$\hat{\mu}_{A_t}(t) \leftarrow \dfrac{\hat{\mu}_{A_t}(t-1)\,(n_{A_t}(t-1)+1)+r_t}{n_{A_t}(t-1)+2}$$ <br>
 >&emsp; $n_{A_t}(t) \leftarrow n_{A_t}(t-1)+1$<br>
 >**end for**
