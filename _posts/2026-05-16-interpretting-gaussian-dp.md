@@ -10,14 +10,14 @@ image:
 ---
 
 ### Statement
-<blockquote>
-<strong>Main Theorem</strong>
+<blockquote class="prompt-tip">
+<strong>Main Theorem:</strong>
 An $\eta$-GDP mechanism is $(\epsilon, \delta)$-DP for every $\epsilon > 0$, but for $\eta > 4$ a non-trivial $\delta$ is achievable only at $\epsilon = \Theta(\eta^2)$.
 </blockquote>
 
 We prove this in two steps. First, we recall the exact conversion from GDP to $(\epsilon, \delta)$-DP, stated here without proof.[^gdp]
 
-<blockquote>
+<blockquote class="prompt-info">
 <strong>Theorem (GDP to $(\epsilon, \delta)$-DP conversion) </strong>
 A mechanism is $\eta$-GDP if and only if it is $(\epsilon, \delta(\epsilon))$-DP for all $\epsilon \geq 0$, where
 
@@ -41,7 +41,7 @@ and $\Phi$ is the standard Gaussian CDF.
 Before bounding the two regimes, we record a monotonicity fact that lets the two endpoints control everything in between.
 
 
-<blockquote>
+<blockquote class="prompt-info">
 <strong>(Monotonicity)</strong>
 For a given $\eta$, $\delta(\epsilon)$ is strictly decreasing in $\epsilon$.
 </blockquote>
@@ -70,7 +70,7 @@ so the two $\frac{1}{\eta}$ terms cancel and $\frac{d\delta}{d\epsilon} = -e^{\e
 
 Note that $\delta$ is strictly decreasing in $\epsilon$ also means that the function is $\delta(\epsilon)$ is invertible as well. We do not need to explicitly find this inverse, we can simply argue its properties indirectly as follows.
 
-<blockquote>
+<blockquote class="prompt-info">
 <strong>Lemma (the two regimes)</strong>
 Fix any $\eta > 4$.
 <br>
