@@ -38,8 +38,7 @@ and $\Phi$ is the standard Gaussian CDF.
     }
 </style>
 
-Before bounding the two regimes, we record a monotonicity fact that lets the two endpoints control everything in between.
-
+First, we show that with the tradeoff law $\delta(\epsilon)$, both being small would be too good to be true.
 
 <blockquote class="prompt-info">
 <strong>(Monotonicity)</strong>
@@ -70,21 +69,18 @@ so the two $\frac{1}{\eta}$ terms cancel and $\frac{d\delta}{d\epsilon} = -e^{\e
 
 Note that $\delta$ is strictly decreasing in $\epsilon$ also means that the function is $\delta(\epsilon)$ is invertible as well. We do not need to explicitly find this inverse, we can simply argue its properties indirectly as follows.
 
-<blockquote class="prompt-info">
-<strong>Lemma (the two regimes)</strong>
-Fix any $\eta > 4$.
-<br>
-1. <em>Vacuous regime.</em> If $\epsilon \leq \eta^2/4$, then
-$$
-\delta \geq 1 - \frac{8}{\eta\sqrt{2\pi}}\, e^{-\eta^2/32}.
-$$
-
-1. <em>Negligible regime.</em> If $\epsilon \geq \eta^2$, then
-$$
-\delta \leq O\!\left(\eta^{-1}\exp(-\eta^2/8)\right).
-$$
-</blockquote>
-
+>**Lemma (the two regimes)**
+>Fix any $\eta > 4$.
+>1. <em>Vacuous regime.</em> If $\epsilon \leq \eta^2/4$, then
+>\$$
+>\delta \geq 1 - \frac{8}{\eta\sqrt{2\pi}}\, e^{-\eta^2/32}.
+>$$
+>
+>1. <em>Negligible regime.</em> If $\epsilon \geq \eta^2$, then
+>\$$
+>\delta \leq O\\!\left(\eta^{-1}\exp(-\eta^2/8)\right).
+>$$
+{: .prompt-info}
 We use the one-sided tail inequality for the standard Gaussian: for $z \geq 1$,
 
 $$
