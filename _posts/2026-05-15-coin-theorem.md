@@ -11,10 +11,9 @@ image:
 
 My Master's thesis was about proving the [Differential Privacy]({% post_url 2026-05-16-differential-privacy %}) of Thompson Sampling[^agrawal2017] for two arm bandits. Calculating expectations of random variables was well known to me, but the progression of my Master's thesis demanded from me the skill of proving high probability bounds, which in turn demanded a deeper knowledge of the underlying distribution.
 
-While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. Looking back in my scratches, I find that the key result that solidified my intuition won't make it into my final draft. I have submitted the full work to [Neurips 2026](https://neurips.cc/) and awaiting a decision. I plan to link it here soon. Unlike the many rare footholds I managed to grab that contributed to the final result, this one finds its place here in the post. The inspiration and the theory of the Coin Theorem is developed here.
+While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. Looking back through my scratches, I find that the key result that solidified my intuition won't make it into my final draft. I have submitted the full work to [Neurips 2026](https://neurips.cc/) and awaiting a decision. I plan to link it here soon. Unlike the many rare footholds I managed to grab that contributed to the final result, this one finds its place here in the post. The inspiration and the theory of the Coin Theorem is developed here.
 
-
-## Background
+## Theorem
 <div style="display:none">
 $$\newcommand{\p}{\mathcal{P}}$$
 $$\newcommand{\coloneqq}{:=}$$
@@ -22,6 +21,119 @@ $$\newcommand{\I}{\mathbb{1}}$$
 $$\newcommand{\E}{\mathbb{E}}$$
 </div>
 
+<blockquote class="prompt-info">
+<strong>Theorem (Coin).</strong> Suppose we have a coin that changes its bias every time it is tossed. Let $X_t=1$ if the toss at time $t$ results in heads and $X_t=0$ if tails, and let $\mathcal{F}_t = \sigma(X_1, \ldots, X_t)$ be the natural filtration. Define $b_t$ as the conditional probability of heads given the past:
+$$b_t \coloneqq \p(X_t=1 \mid \mathcal{F}_{t-1})$$ and assume $b_t \in (0,1)$ almost surely. Then, for any $\delta \in (0, 1)$, as per the above definitions:
+
+$$Y \leq \log(1/\delta) \quad \text{w.p.} \quad 1-\delta$$
+
+</blockquote>
+
+
+### Original Proof
+
+During the game, we observe $\tau-1$ tails and the last toss will be heads. $\tau$ is the key random variable here. $b_t$ maybe a predictable ($\mathcal{F}_{t-1}$ measurable) variable, but we add it to our score only when the past has all tails. If we evaluate it for our concerned path (history containing only tails), we get a known quantity. Define it as $w_t$ instead.
+
+$$w_t := \p(X_t=1|X_1=0,X_2=0,\ldots,X_{t-1}=0)$$
+
+With this, we can define $Y$ as a deterministic function of $\tau$ as $Y = \sum_{t\leq \tau-1}w_t$. The randomness in $Y$ comes solely from the randomness of $\tau$. We define a function
+
+$$
+\begin{align*}
+    S(T) &:= \sum_{t\leq T}w_t\\
+    \text{with that we have,}\quad Y &= S(\tau - 1)
+\end{align*}
+$$
+
+Here, note that $S$ is also a known function, not just predictable. Also, it is non-negative and strictly increasing. Define another known quantity $T^\star$, such that
+
+
+$$
+\begin{align*}
+T^\star := \inf \{t \in \mathbb{N}: S(t) > \log(1/\delta)\}\\
+\implies S(T^\star-1) \leq \log(1/\delta) < S(T^\star).
+\end{align*}
+$$
+
+Now, if the set over which we take the infimum happens to be empty (everything about $S$ is deterministic), then clearly $Y \leq \log(1/\delta)$ with probability 1. Therefore, for the non-trivial case, $T^\star$ is finite. So, with $S$ strictly increasing, we have that $S$ is invertible. Therefore, bounding $Y$ and $\tau$ are essentially the same problem. With $Y = S(\tau - 1)$, we show equality of the following events.
+
+$$\begin{align*}
+\{\tau \leq T^\star\} &= \{S(\tau-1) \leq S(T^\star-1)\}\\
+&= \{Y \leq \log(1/\delta)\}
+\end{align*}
+$$
+
+Since $S$ is deterministic, and $w_t \in (0,1)$, we apply $1 - x \leq \exp(-x)$. We use chain rule to write it as a clean product:
+
+$$
+\begin{align*}
+    \p\left(Y > \log(1/\delta)\right) = \p(\tau > T^\star) &= \p(X_1=0, X_2=0, \ldots,\;X_{T^\star}=0)\\
+    &= \prod_{t\leq T^\star}\p(X_t=0| X_1=0, \ldots,\;X_{t-1}=0)\\
+    &= \prod_{t\leq T^\star}(1-w_t)\\
+    &\leq \exp(-S(T^\star))\\
+    &< \exp(-\log(1/\delta)) = \delta.
+\end{align*}
+$$
+
+<div style="text-align:right">
+$\blacksquare$
+</div>
+
+> Originally, I had informally proved $\p(Y > u)\leq \exp(-u)$ and arrived at the same conclusion. I was fortunate enough to take Advanced Probability Theory class by Prof. Ioannis Karatzas during Fall 2025 to learn the terminology to lay down the proof like so.
+
+---
+
+### Claude's Proof
+Define the cumulative sum of biases:
+
+$$S_t \coloneqq \sum_{k=1}^{t}b_k,\quad \text{so,}\;S_0=0.$$
+
+With $0 < b_t < 1$, and $b_t$ predictable, $S_t$ is strictly increasing and predictable.
+Define a new sequence:
+
+$$M_0=1,\quad M_t = \I(X_t=0)\exp(b_t)\;M_{t-1}.$$
+
+Starting from $1$, we keep on multiplying $\exp$ of the bias when we toss tails. The moment we toss heads, we set the sequence to zero and we never change it thereafter. Thus $M$ is an absorbing process.
+
+Clearly, $M_t$ is non-negative.
+With $\E_t[.] := \E[.|\mathcal{F}_{t-1}]$, we have:
+
+$$
+\begin{align*}
+\E_t[M_t] &= \E[\I(X_t=0)\exp(b_t)\;M_{t-1}|\mathcal{F}_{t-1}]\\
+&= M_{t-1}\exp(b_t)\;\E[\I(X_t=0)|\mathcal{F}_{t-1}]\\
+&= M_{t-1}\exp(b_t)\;\p(X_t=0|\mathcal{F}_{t-1})\\
+&= M_{t-1}\exp(b_t)\;(1-b_t)\\
+&\leq M_{t-1} \qquad \text{since $\exp(-x) \geq 1-x$}
+\end{align*}
+$$
+
+Hence, $(M_t)_{t \geq 0}$ is a non-negative supermartingale.
+
+Moreover, since $S_t$ is increasing, we get:
+
+$$Y = \sum_{t < \tau} b_t = \sup_{t < \tau}S_t$$
+
+$$\sup_{t \geq 0}M_t = \sup_{t < \tau} \exp(S_t) = \exp(\sup_{t < \tau} S_t) = \exp(Y)$$
+
+
+Using Ville's inequality:
+
+$$\p\left(\sup_{t \geq 0} M_t \geq a\right)\leq \frac{\E[M_0]}{a}.$$
+
+and also $M_0=1$. This essentially boils down to:
+
+$$\p(\exp(Y) \geq a) \leq \frac{1}{a}$$
+
+Setting $a=1/\delta$, we get the required result.
+<div style="text-align:right">
+$\blacksquare$
+</div>
+
+---
+
+
+## Background
 During 2022, when I worked at [MakeMyTrip](https://makemytrip.com/), I was working on the Single Hotel Search project[^yadav2022]. We had four different recommendation systems at our disposal and had to comparatively evaluate each of their Click Through Rate (CTR) and Conversion Rate (CR). A straightforward method would be to randomly split the upcoming month's incoming traffic into four parts and serve one model to all users in each part. Then we could evaluate CTR and CR for every model. However, this exploratory endeavor to find the best model results in the organization bearing some revenue loss during this month's time: obviously three fourths of the month's traffic was not served by the optimal model.
 
 We reported metrics for every user cohort (e.g. new users, 4-5 star bookers, others grouped by city: Bangalore, Delhi; and so on). But for simplicity assume every user identical and independent. At each time we have to decide which model to use to recommend hotels on the listing page right below the hotel they searched for. Based on the recommendations of the model (and other factors of the user beyond our control) the user decides to click on and/or book the hotel. We only know how good the choice of the model (used in the recommendation system) is only after we observe enough clicks and books. However, dwelling on a bad choice leads to regret. Essentially, a natural question to ask is:
@@ -95,7 +207,7 @@ An arm is likely to be played if it has a large $\hat\mu_a$, or a small $n_a$ (d
 
 The original project [^yadav2022] I was a part of at MakeMyTrip used a Contextual Bandits version of TS. It led to a 1.5%-2% lift in overall conversion, but more importantly 20% lift for cases where the searched hotel was sold out, since it was better at recommending alternatives.
 
-I came to Columbia with the sole intention of starting research in Safe Reinforcement Learning. My plan was to start with theoretical research to solidify my mathematical intuition before setting foot in anything empirical. Since I believe in starting with fundamentals, and given my background in bandits I sought out Prof. Agrawal's guidance. I proposed to work with her on a project with the goal of solving the open problem on the complexity of Joint Differential Privacy in linear contextual bandits[^azize2024]. After exploring this problem as a part of the course project, she generously agreed to advise my Master's Thesis. I took up the studying the differential privacy of Thompson Sampling for the two arm bandit setting. This is how I began my journey of Safe RL research.
+I came to Columbia with the sole intention of starting research in Safe Reinforcement Learning. My plan was to start with theoretical research to solidify my mathematical intuition before setting foot in anything empirical. Since I believe in starting with fundamentals, and given my background in bandits I sought out Prof. Agrawal's guidance. I proposed to work with her on a project with the goal of solving the open problem on the complexity of Joint Differential Privacy in linear contextual bandits[^azize2024]. After exploring this problem as a part of the course project, she generously agreed to advise my Master's Thesis. I took up studying the differential privacy of Thompson Sampling for the two arm bandit setting. This is how I began my journey of Safe RL research.
 
 ### Differential Privacy
 Differential Privacy (DP) is a property of any randomized algorithm that takes a database with every row corresponding to one user's data as input. The extent of privacy is governed by the extent to which output distribution can change when one user's data is replaced or omitted. In a two-armed bandit setting with finite horizon $T$, without loss of generality, we can consider the rewards to be pre-sampled and the algorithm to sequentially process them. Thus rewards can be considered to be the input and the actions can be considered as random outputs.
@@ -244,7 +356,7 @@ $$
 \end{align*}
 $$
 
-The proportionality follows from the Mill's inequality, which states that the density and the cdf are closely related to each other for a normal distribution.
+The proportionality follows from Mills' inequality, which states that the density and the cdf are closely related to each other for a normal distribution.
 
 >About, $Y(j) := \sum_{\tau_j}^{\tau_{j+1}} I(A_t=1)f(t)$, we conjecture two things about $f(t)$ when $A_t=1$.
 >1. <p>$f(t) \propto P(A_t=2|A_{1:t-1})$</p>
@@ -295,119 +407,6 @@ $$Y \coloneqq \sum_{t=1}^{\tau-1} b_t$$
 
 So if you choose to be greedy and set the bias of the coin to be $>0.5$, you will most likely toss heads and the game ends right away. On the other hand if you set the bias to be $<0.1$, you will likely toss many tails in a row, and even then the total score might be low. What is a high probability upper bound on the total score earned?
 
-
-## Theorem
-
-<blockquote class="prompt-info">
-<strong>Theorem (Coin).</strong> Suppose we have a coin that changes its bias every time it is tossed. Let $X_t=1$ if the toss at time $t$ results in heads and $X_t=0$ if tails, and let $\mathcal{F}_t = \sigma(X_1, \ldots, X_t)$ be the natural filtration. Define $b_t$ as the conditional probability of heads given the past:
-$$b_t \coloneqq \p(X_t=1 \mid \mathcal{F}_{t-1})$$ and assume $b_t \in (0,1)$ almost surely. Then, for any $\delta \in (0, 1)$, as per the above definitions:
-
-$$Y \leq \log(1/\delta) \quad \text{w.p.} \quad 1-\delta$$
-
-</blockquote>
-
-
-### Original Proof
-
-During the game, we observe $\tau-1$ tails and the last toss will be heads. $\tau$ is the key random variable here. $b_t$ maybe a predictable ($\mathcal{F}_{t-1}$ measurable) variable, but we are only adding it to our score only when the past has all tails. If we evaluate it for our concerned path (history containing only tails), we get a known quantity. Define it as $w_t$ instead.
-
-$$w_t := \p(X_t=1|X_1=0,X_2=0,\ldots,X_{t-1}=0)$$
-
-With this, we can define $Y$ as a deterministic function of $\tau$ as $Y = \sum_{t\leq \tau-1}w_t$. The randomness in $Y$ comes solely from the randomness of $\tau$. We define a function
-
-$$
-\begin{align*}
-    S(T) &:= \sum_{t\leq T}w_t\\
-    \text{with that we have,}\quad Y &= S(\tau - 1)
-\end{align*}
-$$
-
-Here, note that $S$ is also a known function, not just predictable. Also, it is non-negative and strictly increasing. Define another known quantity $T^\star$, such that
-
-
-$$
-\begin{align*}
-T^\star := \inf \{t \in \mathbb{N}: S(t) > \log(1/\delta)\}\\
-\implies S(T^\star-1) \leq \log(1/\delta) < S(T^\star).
-\end{align*}
-$$
-
-Now, if the set over which we take the infimum happens to be empty (everything about $S$ is deterministic), then clearly $Y \leq \log(1/\delta)$ with probability 1. Therefore, for the non-trivial case, $T^\star$ is finite. So, with $S$ strictly increasing, we have that $S$ is invertible. Therefore, bounding $Y$ and $\tau$ are essentially the same problem. With $Y = S(\tau - 1)$, we show equality of the following events.
-
-$$\begin{align*}
-\{\tau \leq T^\star\} &= \{S(\tau-1) \leq S(T^\star-1)\}\\
-&= \{Y \leq \log(1/\delta)\}
-\end{align*}
-$$
-
-Since $S$ is deterministic, and $w_t \in (0,1)$, we apply $1 - x \leq \exp(-x)$. We use chain rule to write it as a clean product:
-
-$$
-\begin{align*}
-    \p\left(Y > \log(1/\delta)\right) = \p(\tau > T^\star) &= \p(X_1=0, X_2=0, \ldots,\;X_{T^\star}=0)\\
-    &= \prod_{t\leq T^\star}\p(X_t=0| X_1=0, \ldots,\;X_{t-1}=0)\\
-    &= \prod_{t\leq T^\star}(1-w_t)\\
-    &\leq \exp(-S(T^\star))\\
-    &< \exp(-\log(1/\delta)) = \delta.
-\end{align*}
-$$
-
-<div style="text-align:right">
-$\blacksquare$
-</div>
-
-> Originally, I had informally proved $\p(Y > u)\leq \exp(-u)$ and arrived at the same conclusion. I was fortunate enough to take Advanced Probability Theory class by Prof. Ioannis Karatzas during Fall 2025 to learn the terminology to lay down the proof like so.
-
----
-
-### Claude's Proof
-Define the cumulative sum of biases:
-
-$$S_t \coloneqq \sum_{k=1}^{t}b_k,\quad \text{so,}\;S_0=0.$$
-
-With $0 < b_t < 1$, and $b_t$ predictable, $S_t$ is strictly increasing and predictable.
-Define a new sequence:
-
-$$M_0=1,\quad M_t = \I(X_t=0)\exp(b_t)\;M_{t-1}.$$
-
-Starting from $1$, we keep on multiplying $\exp$ of the bias when we toss tails. The moment we toss heads, we set the sequence to zero and we never change it thereafter. Thus $M$ is an absorbing process.
-
-Clearly, $M_t$ is non-negative.
-With $\E_t[.] := \E[.|\mathcal{F}_{t-1}]$, we have:
-
-$$
-\begin{align*}
-\E_t[M_t] &= \E[\I(X_t=0)\exp(b_t)\;M_{t-1}|\mathcal{F}_{t-1}]\\
-&= M_{t-1}\exp(b_t)\;\E[\I(X_t=0)|\mathcal{F}_{t-1}]\\
-&= M_{t-1}\exp(b_t)\;\p(X_t=0|\mathcal{F}_{t-1})\\
-&= M_{t-1}\exp(b_t)\;(1-b_t)\\
-&\leq M_{t-1} \qquad \text{since $\exp(-x) \geq 1-x$}
-\end{align*}
-$$
-
-Hence, $(M_t)_{t \geq 0}$ is a non-negative supermartingale.
-
-Moreover, since $S_t$ is increasing, we get:
-
-$$Y = \sum_{t < \tau} b_t = \sup_{t < \tau}S_t$$
-
-$$\sup_{t \geq 0}M_t = \sup_{t < \tau} \exp(S_t) = \exp(\sup_{t < \tau} S_t) = \exp(Y)$$
-
-
-Using Ville's inequality:
-
-$$\p\left(\sup_{t \geq 0} M_t \geq a\right)\leq \frac{\E[M_0]}{a}.$$
-
-and also $M_0=1$. This essentially boils down to:
-
-$$\p(\exp(Y) \geq a) \leq \frac{1}{a}$$
-
-Setting $a=1/\delta$, we get the required result.
-<div style="text-align:right">
-$\blacksquare$
-</div>
-
----
 
 ## Connecting back
 After factoring probability of the lesser arm, we end up with:
