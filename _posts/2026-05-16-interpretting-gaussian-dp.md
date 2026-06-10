@@ -10,14 +10,14 @@ image:
 ---
 
 ### Statement
-<blockquote>
-<strong>Main Theorem</strong>
+<blockquote class="prompt-tip">
+<strong>Main Theorem:</strong>
 An $\eta$-GDP mechanism is $(\epsilon, \delta)$-DP for every $\epsilon > 0$, but for $\eta > 4$ a non-trivial $\delta$ is achievable only at $\epsilon = \Theta(\eta^2)$.
 </blockquote>
 
 We prove this in two steps. First, we recall the exact conversion from GDP to $(\epsilon, \delta)$-DP, stated here without proof.[^gdp]
 
-<blockquote>
+<blockquote class="prompt-info">
 <strong>Theorem (GDP to $(\epsilon, \delta)$-DP conversion) </strong>
 A mechanism is $\eta$-GDP if and only if it is $(\epsilon, \delta(\epsilon))$-DP for all $\epsilon \geq 0$, where
 
@@ -38,10 +38,9 @@ and $\Phi$ is the standard Gaussian CDF.
     }
 </style>
 
-Before bounding the two regimes, we record a monotonicity fact that lets the two endpoints control everything in between.
+First, we show that with the tradeoff law $\delta(\epsilon)$, both being small would be too good to be true.
 
-
-<blockquote>
+<blockquote class="prompt-info">
 <strong>(Monotonicity)</strong>
 For a given $\eta$, $\delta(\epsilon)$ is strictly decreasing in $\epsilon$.
 </blockquote>
@@ -70,21 +69,18 @@ so the two $\frac{1}{\eta}$ terms cancel and $\frac{d\delta}{d\epsilon} = -e^{\e
 
 Note that $\delta$ is strictly decreasing in $\epsilon$ also means that the function is $\delta(\epsilon)$ is invertible as well. We do not need to explicitly find this inverse, we can simply argue its properties indirectly as follows.
 
-<blockquote>
-<strong>Lemma (the two regimes)</strong>
-Fix any $\eta > 4$.
-<br>
-1. <em>Vacuous regime.</em> If $\epsilon \leq \eta^2/4$, then
-$$
-\delta \geq 1 - \frac{8}{\eta\sqrt{2\pi}}\, e^{-\eta^2/32}.
-$$
-
-1. <em>Negligible regime.</em> If $\epsilon \geq \eta^2$, then
-$$
-\delta \leq O\!\left(\eta^{-1}\exp(-\eta^2/8)\right).
-$$
-</blockquote>
-
+>**Lemma (the two regimes)**
+>Fix any $\eta > 4$.
+>1. <em>Vacuous regime.</em> If $\epsilon \leq \eta^2/4$, then
+>\$$
+>\delta \geq 1 - \frac{8}{\eta\sqrt{2\pi}}\, e^{-\eta^2/32}.
+>$$
+>
+>1. <em>Negligible regime.</em> If $\epsilon \geq \eta^2$, then
+>\$$
+>\delta \leq O\\!\left(\eta^{-1}\exp(-\eta^2/8)\right).
+>$$
+{: .prompt-info}
 We use the one-sided tail inequality for the standard Gaussian: for $z \geq 1$,
 
 $$
