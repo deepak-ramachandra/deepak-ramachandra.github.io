@@ -9,11 +9,10 @@ image:
     alt: Every once in a while, in a period of time that feels long and filled with exhaustion, though very rarely, you might see something like this. Just thinking about it gets your heart racing, and you can feel your confidence coming back. After a long and strenuous climb to the top, it serves as the foothold that you desperately needed. It is not a miracle, maybe it's one out of a hundred, or even one out of a thousand, but it's the one you went to reach and managed to grab. By grabbing and connecting these rare moments, you are able to keep climbing higher and higher.— Fuki Hibarida, (Haikyuu!!)
 ---
 
-My Master's thesis was about proving the [Differential Privacy]({% post_url 2026-05-16-differential-privacy %}) of Thompson Sampling[^agrawal2017] for two arm bandits. Calculating expectations of random variables was well known to me, but the progression of my Master's thesis demanded from me the skill of proving high probability bounds, which in turn demanded a deeper knowledge of the underlying distribution.
+My Master's thesis was about proving the [Differential Privacy]({% post_url 2026-05-16-differential-privacy %}) of Thompson Sampling[^agrawal2017] for two arm bandits. Calculating expectations of random variables was well known to me, but the progression of my Master's thesis demanded from me the skill of proving high probability bounds and consequently a deeper understanding of the underlying distribution. While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. I have submitted the full work to [NeurIPS 2026](https://neurips.cc/) and I am awaiting a decision. I plan to link it here soon.
 
-While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. Looking back through my scratches, I find that the key result that solidified my intuition won't make it into my final draft. I have submitted the full work to [Neurips 2026](https://neurips.cc/) and awaiting a decision. I plan to link it here soon. Unlike the many rare footholds I managed to grab that contributed to the final result, this one finds its place here in the post. The inspiration and the theory of the Coin Theorem is developed here.
+Most of the work poured into the main proof involved different approaches and iterations. Among the many rare footholds I managed to grab that contributed to the final submitted work, this result turned out to provide a valid, illustrative, intermediate goal that gave me the confidence for the development of the algebra of my thesis. Looking back through many pages of scratches, the theorem developed in this post also sat close to my heart especially because this is the first high probability bound I ever formulated and worked on. And yet, looking back at my thesis, this result will not be making it into my final draft. So, I decided to write this post. The inspiration and the theory of the Coin Theorem are developed here. My original proof exploits a key pattern in the game, whereas Claude Code gave a totally different, slick proof and hopefully a great read.
 
-## Theorem
 <div style="display:none">
 $$\newcommand{\p}{\mathcal{P}}$$
 $$\newcommand{\coloneqq}{:=}$$
@@ -21,6 +20,19 @@ $$\newcommand{\I}{\mathbb{1}}$$
 $$\newcommand{\E}{\mathbb{E}}$$
 </div>
 
+## Game
+Suppose you are given the liberty to set the bias of a coin to whatever value $b_t \in (0,1)$ before you toss it. If you toss a head, the game is over. However, if you toss a tail, you get a score equal to the bias $b_t$ of the coin you just tossed. The game is played for the total score. Let $X_t=1$ if the toss at time $t$ results in heads and $X_t=0$ if tails. Let $\tau$ be the first time we toss heads. That is, we toss this coin $\tau$ times. Note that the distribution of this random variable $\tau$ depends on how you (the player) set the bias $b_t$ on every turn.
+
+$$\tau = \min\{t \mid X_t=1\}$$
+
+Define $Y$ as the sum of biases until we toss heads for the first time. That is:
+
+$$Y \coloneqq \sum_{t=1}^{\tau-1} b_t$$
+
+So if you choose to be greedy and set the bias of the coin to be $>0.5$, you will most likely toss heads and the game ends right away. On the other hand if you set the bias to be $<0.1$, you will likely toss many tails in a row, and even then the total score might be low. What is a high probability upper bound on the total score earned?
+
+
+## Theorem
 <blockquote class="prompt-info">
 <strong>Theorem (Coin).</strong> Suppose we have a coin that changes its bias every time it is tossed. Let $X_t=1$ if the toss at time $t$ results in heads and $X_t=0$ if tails, and let $\mathcal{F}_t = \sigma(X_1, \ldots, X_t)$ be the natural filtration. Define $b_t$ as the conditional probability of heads given the past:
 $$b_t \coloneqq \p(X_t=1 \mid \mathcal{F}_{t-1})$$ and assume $b_t \in (0,1)$ almost surely. Then, for any $\delta \in (0, 1)$, as per the above definitions:
@@ -32,7 +44,7 @@ $$Y \leq \log(1/\delta) \quad \text{w.p.} \quad 1-\delta$$
 
 ### Original Proof
 
-During the game, we observe $\tau-1$ tails and the last toss will be heads. $\tau$ is the key random variable here. $b_t$ maybe a predictable ($\mathcal{F}_{t-1}$ measurable) variable, but we add it to our score only when the past has all tails. If we evaluate it for our concerned path (history containing only tails), we get a known quantity. Define it as $w_t$ instead.
+During the game, we observe $\tau-1$ tails and the last toss will be heads. $\tau$ is the key random variable here. $b_t$ may be a predictable ($\mathcal{F}_{t-1}$ measurable) variable, but we add it to our score only when the past has all tails. If we evaluate it for our concerned path (history containing only tails), we get a known quantity. Define it as $w_t$ instead.
 
 $$w_t := \p(X_t=1|X_1=0,X_2=0,\ldots,X_{t-1}=0)$$
 
@@ -390,22 +402,6 @@ Setting $k = \log(1/\delta)/p$, we get the required result.
 
 >However, what if the bias (although predictable) was changing with time? This precisely describes our problem: playing arm 1 modeled as tossing tails and playing arm 2 as tossing heads. The score is the total accumulated bias throughout this run. The freedom to consider any reward sequence is modeled as the freedom to choose the bias of the coin before every toss.
 {: .prompt-info}
-
-
-## Game
-
-Most of the work poured into the main proof involved different approaches and iterations. Among many pages of scratches, the theorem developed in this post sat close to my heart. This is the first high probability bound I ever formulated and worked on. This result turned out to provide a valid, illustrative, intermediate goal that gave me the confidence for the development of the algebra of my thesis.  Unfortunately, it will not make it into the final draft, but it finds its place on the web. My original proof exploits a key pattern in the game, whereas Claude Code gave a totally different, slick proof and hopefully a great read.
-Suppose you are given the liberty to set the bias of coin to whatever value $b_t \in (0,1)$ before you toss it. Every time you toss a tail, you get some score. However, if you toss a head, the game is over. The score you get is equal to the bias $b_t$ of the coin you just tossed.
-
-Let $\tau$ be the first time we toss heads. That is, we toss this coin $\tau$ times.
-
-$$\tau = \min\{t \mid X_t=1\}$$
-
-Define $Y$ as the sum of biases until we toss heads for the first time. That is:
-
-$$Y \coloneqq \sum_{t=1}^{\tau-1} b_t$$
-
-So if you choose to be greedy and set the bias of the coin to be $>0.5$, you will most likely toss heads and the game ends right away. On the other hand if you set the bias to be $<0.1$, you will likely toss many tails in a row, and even then the total score might be low. What is a high probability upper bound on the total score earned?
 
 
 ## Connecting back
