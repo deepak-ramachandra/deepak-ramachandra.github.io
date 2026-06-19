@@ -9,9 +9,12 @@ image:
     alt: Every once in a while, in a period of time that feels long and filled with exhaustion, though very rarely, you might see something like this. Just thinking about it gets your heart racing, and you can feel your confidence coming back. After a long and strenuous climb to the top, it serves as the foothold that you desperately needed. It is not a miracle, maybe it's one out of a hundred, or even one out of a thousand, but it's the one you went to reach and managed to grab. By grabbing and connecting these rare moments, you are able to keep climbing higher and higher.— Fuki Hibarida, (Haikyuu!!)
 ---
 
-My Master's thesis was about proving the [Differential Privacy]({% post_url 2026-05-16-differential-privacy %}) of Thompson Sampling[^agrawal2017] for two arm bandits. Calculating expectations of random variables was well known to me, but the progression of my Master's thesis demanded from me the skill of proving high probability bounds and consequently a deeper understanding of the underlying distribution. While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. I have submitted the full work to [NeurIPS 2026](https://neurips.cc/) and I am awaiting a decision. I plan to link it here soon.
+## Preface
+My Master's thesis was about proving the [Differential Privacy]({% post_url 2026-05-16-differential-privacy %}) of Thompson Sampling[^agrawal2017] for two arm bandits. Calculating expectations of random variables was well known to me, but the progression of my Master's thesis demanded from me the skill of proving high probability bounds and consequently a deeper understanding of the underlying distribution. While deriving upper bounds for the privacy loss of Thompson Sampling, I was stuck with an expression without a direction to pursue. I needed an intermediate foothold from where I could proceed to the solution intuitively. After making many attempts I finally succeeded in bounding the privacy loss. I have submitted the full work to [NeurIPS 2026](https://neurips.cc/) and I am awaiting a decision.
 
 Most of the work poured into the main proof involved different approaches and iterations. Among the many rare footholds I managed to grab that contributed to the final submitted work, this result turned out to provide a valid, illustrative, intermediate goal that gave me the confidence for the development of the algebra of my thesis. Looking back through many pages of scratches, the theorem developed in this post also sat close to my heart especially because this is the first high probability bound I ever formulated and worked on. And yet, looking back at my thesis, this result will not be making it into my final draft. So, I decided to write this post. The inspiration and the theory of the Coin Theorem are developed here. My original proof exploits a key pattern in the game, whereas Claude Code gave a totally different, slick proof and hopefully a great read.
+
+An interested reader may continue reading past the Coin theorem to know how it came to be useful in my thesis. However, this requires them to sit through the background of the Multi-Arm Bandit problem, the Thompson Sampling algorithm and an algorithm's property called Differential Privacy.
 
 <div style="display:none">
 $$\newcommand{\p}{\mathcal{P}}$$
@@ -30,6 +33,7 @@ Define $Y$ as the sum of biases until we toss heads for the first time. That is:
 $$Y \coloneqq \sum_{t=1}^{\tau-1} b_t$$
 
 So if you choose to be greedy and set the bias of the coin to be $>0.5$, you will most likely toss heads and the game ends right away. On the other hand if you set the bias to be $<0.1$, you will likely toss many tails in a row, and even then the total score might be low. What is a high probability upper bound on the total score earned?
+
 
 
 ## Theorem
@@ -143,6 +147,7 @@ $\blacksquare$
 </div>
 
 ---
+
 
 
 ## Background
@@ -330,6 +335,39 @@ $$
 $$
 
 
+and we get:
+
+$$
+\I(A_t=1)f(t) = \frac{\phi\left(\sqrt{k(t-1)}\hat\Delta(t-1)\right)}{\p_R(A_t=1|A_{1:t-1})}
+$$
+
+<p>since we have $\p_R(A_t=1|A_{1:t-1}) \geq 1/2$, we plug in the formula for the standard gaussian density $\phi$.</p>
+
+$$
+\begin{equation}\label{eq:stuck}
+\I(A_t=1)f(t) \leq 2\times\sqrt{\frac{k}{2\pi}}\exp\left(-\frac{k\hat\Delta^2}{2}\right)
+\end{equation}
+$$
+
+Putting it all together, we get the geometric-like series:
+
+$$
+\sum_{t \leq T} \left(\frac{\I(A_t=1)}{\sqrt{n_2(t-1) + 1}}\right) f(t) \leq \sum_{j=1}^{n_2(T)} \frac{1}{\sqrt{j + 1}}\left(\sum_{t=\tau_j}^{\tau_{j+1} - 1} 2\times\sqrt{\frac{k}{2\pi}}\exp\left(-\frac{k\hat\Delta^2}{2}\right)\right)
+$$
+
+using $k \leq j + 1$, we can make this expression somewhat workable:
+
+$$
+\begin{align*}
+    &\sum_{t \leq T} \left(\frac{\I(A_t=1)}{\sqrt{n_2(t-1) + 1}}\right) f(t) \\
+    &\leq \sum_{j=1}^{n_2(T)} \frac{1}{\sqrt{j + 1}}\left(\sum_{t=\tau_j}^{\tau_{j+1} - 1} 2\times\sqrt{\frac{j + 1}{2\pi}}\exp\left(-\frac{k\hat\Delta^2}{2}\right)\right)\\
+    &\leq \sqrt{\frac{2}{\pi}}\;\sum_{j=1}^{n_2(T)}\sum_{t=\tau_j}^{\tau_{j+1} - 1} \exp\left(-\frac{k\hat\Delta^2}{2}\right)
+\end{align*}
+$$
+
+> what am i doing here
+{: .prompt-danger}
+
 Define
 
 $$Y(j) = \sum_{t=\tau_j}^{\tau_{j+1} - 1}\I(A_t=1)f(t)$$
@@ -403,6 +441,13 @@ Setting $k = \log(1/\delta)/p$, we get the required result.
 >However, what if the bias (although predictable) was changing with time? This precisely describes our problem: playing arm 1 modeled as tossing tails and playing arm 2 as tossing heads. The score is the total accumulated bias throughout this run. The freedom to consider any reward sequence is modeled as the freedom to choose the bias of the coin before every toss.
 {: .prompt-info}
 
+<blockquote class="prompt-info">
+<strong>Theorem (Restated).</strong> Suppose we have a coin that changes its bias every time it is tossed. Let $X_t=1$ if the toss at time $t$ results in heads and $X_t=0$ if tails, and let $\mathcal{F}_t = \sigma(X_1, \ldots, X_t)$ be the natural filtration. Define $b_t$ as the conditional probability of heads given the past:
+$$b_t \coloneqq \p(X_t=1 \mid \mathcal{F}_{t-1})$$ and assume $b_t \in (0,1)$ almost surely. Then, for any $\delta \in (0, 1)$, as per the above definitions:
+
+$$Y \leq \log(1/\delta) \quad \text{w.p.} \quad 1-\delta$$
+
+</blockquote>
 
 ## Connecting back
 After factoring probability of the lesser arm, we end up with:
@@ -442,10 +487,75 @@ $$
 \end{align*}
 $$
 
-using the same logic. However, this second iteration had negative terms and we had to use time-uniform bounds. As a result, the above coin theorem was not included in my thesis. Based on the form of inequalities I have in the main paper, my advisor suggested I use Freedman-style bounds prevalent in bandit papers [^beygelzimer2011]. All in all, I am very grateful for the continual guidance and support of my advisor Prof. Agrawal throughout my Master's thesis.
+using the same logic. However, this second iteration had negative terms and we had to use time-uniform bounds. As a result, the above coin theorem was not included in my thesis. Based on the form of inequalities I have in the main paper, my advisor suggested I use Freedman-style bounds prevalent in bandit papers [^beygelzimer2011][^stocadv]. As such, the following two lemmas are pretty much Prof. Agrawal's work, spotting key patterns and applying standard results from Bandit literature.
+
+> **Lemma** For any Multi-Arm Bandit algorithm such as Thompson Sampling, we have:
+>
+$$
+\begin{align*}
+    \sum_{t\leq T}\frac{\p(A_t=z|a_{1:t-1})}{\sqrt{n_z(t-1) + 1}} &= \mathcal{O}\left(\sqrt{T\log(T/\delta)}\right) \quad \text{w.p} \quad 1-\delta\\
+    \sum_{t\leq T}\frac{\p(A_t=z|a_{1:t-1})}{n_z(t-1) + 1} &= \mathcal{O}\left(\log T\log(T/\delta)\right) \quad \text{w.p} \quad 1-\delta
+\end{align*}
+$$
+>
+{: .prompt-info}
+
+<p>
+Since we the point-wise bound:
+$$
+\begin{equation}\label{eq:obv_root_t}
+    \sum_{t\leq T}\frac{I(A_t=z)}{\sqrt{n_z(t-1) + 1}} = \mathcal{O}\left(\sqrt{T}\right),
+\end{equation}
+$$
+The square-root bound follows from the Azuma-Hoefding's inequality on martingales. Suppose $(M_t)_{t=1}^\infty$ with bounded differences, $|M_t - M_{t-1}| \leq c_t$ a.s. Suppose its natural filtration is called $(\mathcal{F})_{t=1}^\infty$. Recall that:
+
+$$
+\p(M_T - M_0 \geq \epsilon) \leq \exp\left(-\frac{\epsilon^2}{2\sum_{t\leq T}c_t^2}\right)
+$$
+
+We let
+
+$$
+\begin{align*}
+    M_0 &= 0\\
+    M_\tau &= \sum_{t < \tau} X_t,\quad X_t = \frac{\p(A_t=z|\mathcal{F}_{t-1}) - I(A_t=z)}{\sqrt{n_z(t-1) + 1}}.
+\end{align*}
+$$
+
+Under this definition, $M_t$ is a martingale because for $t=1,2\ldots$, we have:
+
+$$
+\begin{align*}
+    \E[M_t-M_{t-1}|\mathcal{F}_{t-1}] &= \E[X_t|\mathcal{F}_{t-1}]\\
+    &= \E\left[\frac{\p(A_t=z|\mathcal{F}_{t-1}) - I(A_t=z)}{\sqrt{n_z(t-1) + 1}}\middle|\mathcal{F}_{t-1}\right]\\
+    &= 0
+\end{align*}
+$$
+
+And we have bounded increments with $|X_t| \leq 1$ almost surely for $t\in \mathbb{N}$.
+
+$$M_T - M_0 \leq \epsilon\quad\text{w.p.}\quad 1-\exp\left(-\frac{\epsilon^2}{2T}\right)$$
+
+Letting $\epsilon = \sqrt{2T\log(T/\delta)}$, and substituting for $M_T$, we have:
+
+$$
+\begin{align*}
+\sum_{t\leq T} \frac{\p(A_t=z|\mathcal{F}_{t-1}) - I(A_t=z)}{\sqrt{n_z(t-1) + 1}} &\leq \sqrt{2T\log(T/\delta)}\quad\text{w.p.}\quad 1-\delta\\
+\sum_{t\leq T} \frac{\p(A_t=z|\mathcal{F}_{t-1})}{\sqrt{n_z(t-1) + 1}} &\leq
+\sum_{t\leq T} \frac{I(A_t=z)}{\sqrt{n_z(t-1) + 1}} + \sqrt{2T\log(T/\delta)}\quad\text{w.p.}\quad 1-\delta
+\end{align*}
+$$
+
+Substituting from Eq. $\eqref{eq:obv_root_t}$, we get the required result.
+<div style="text-align:right">
+$\square$
+</div>
+
+
+</p>
 
 ## Conclusion
-This post gave a brief overview about Thompson sampling and Differential Privacy. It then gave a brief overview of the problem I got stuck at when bounding the privacy loss. This led to the development of the game and my proof. This post serves as a souvenir as I finish up my Master's thesis.
+This post develops the background about an important problem that I came across while working on my thesis. Then, I formulate an equivalent, interprettable and simpler problem and provide an intuitive proof. This result served as a crucial intermediate result that paved the way for swift progress and eventual completion of my Master's thesis. Last, but not the least, I am very grateful for the continual guidance and support of my advisor Prof. Agrawal throughout my Master's thesis.
 
 
 [^agrawal2017]: Agrawal, S., & Goyal, N. (2017). Near-Optimal Regret Bounds for Thompson Sampling. *Journal of the ACM*, 64(5), Article 30.
@@ -455,3 +565,5 @@ This post gave a brief overview about Thompson sampling and Differential Privacy
 [^azize2024]: Azize, A., & Basu, D. (2024). [Open Problem: What is the Complexity of Joint Differential Privacy in Linear Contextual Bandits?](https://proceedings.mlr.press/v247/azize24a.html) *Proceedings of the Thirty-Seventh Conference on Learning Theory (COLT)*, PMLR 247:5306–5311.
 
 [^beygelzimer2011]: Alina Beygelzimer, John Langford, Lihong Li, Lev Reyzin, and Robert E. Schapire. “Contextual bandit algorithms with supervised learning guarantees.” Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics. JMLR Workshop and Conference Proceedings, 2011.
+
+[^stocadv]: Lykouris, T., Mirrokni, V., & Paes Leme, R. (2018). Stochastic bandits robust to adversarial corruptions. In Proceedings of the 50th Annual ACM SIGACT Symposium on Theory of Computing (pp. 114–122). ACM. [https://doi.org/10.1145/3188745.3188918](https://doi.org/10.1145/3188745.3188918)
