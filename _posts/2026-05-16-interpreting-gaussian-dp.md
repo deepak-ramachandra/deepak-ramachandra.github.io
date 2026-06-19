@@ -1,5 +1,5 @@
 ---
-title: "Interpretting Gaussian Differential Privacy"
+title: "Interpreting Gaussian Differential Privacy"
 date: 2026-05-16
 categories: [Math]
 tags: [differential-privacy, statistics, hypothesis-testing]
