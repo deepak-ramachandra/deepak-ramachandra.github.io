@@ -74,7 +74,7 @@ $$\mathcal{L}^{(\text{Yes})} = \log\frac{0.95}{0.90} \approx 0.054, \qquad \math
 
 A positive value ($\approx 0.054$) means observing **Yes** gives the adversary mild evidence that the underlying dataset was $D$ (the one with the smoker). A negative value ($\approx -0.693$) means observing **No** is actually *more likely* under $D'$, so it points toward $D'$. In this case neither value is large, so the privacy cost of a single query is small — but the loss accumulates with every additional query.
 
-More generally, when some output $o$ yields a very large privacy loss, an adversary who observes $o$ can decisively reject the null hypothesis that the input was $D'$ — and in doing so, infer private information about the individual whose record differs between $D$ and $D'$. This connection between privacy loss and hypothesis testing is the starting point of a richer framework explored in the [next post]({% post_url 2026-05-16-interpretting-gaussian-dp %}).
+More generally, when some output $o$ yields a very large privacy loss, an adversary who observes $o$ can decisively reject the null hypothesis that the input was $D'$ — and in doing so, infer private information about the individual whose record differs between $D$ and $D'$. This connection between privacy loss and hypothesis testing is the starting point of a richer framework explored in the [next post]({% post_url 2026-05-16-interpreting-gaussian-dp %}).
 
 ---
 
@@ -130,7 +130,7 @@ Sequential composition gives $(k\varepsilon, k\delta)$-DP for $k$ applications o
 >
 > For small $\varepsilon$, this is approximately $O\left(\varepsilon\sqrt{k\ln(1/\delta')}\right)$.
 
-This square-root improvement is significant in practice and motivates the GDP composition rule $\mu = \sqrt{\sum \mu_i^2}$, covered in the [next post]({% post_url 2026-05-16-interpretting-gaussian-dp %}).
+This square-root improvement is significant in practice and motivates the GDP composition rule $\mu = \sqrt{\sum \mu_i^2}$, covered in the [next post]({% post_url 2026-05-16-interpreting-gaussian-dp %}).
 
 
 ---
