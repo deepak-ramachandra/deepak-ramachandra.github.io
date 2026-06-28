@@ -494,7 +494,7 @@ using the same logic. However, this second iteration had negative terms and we h
 $$
 \begin{align*}
     \sum_{t\leq T}\frac{\p(A_t=z|a_{1:t-1})}{\sqrt{n_z(t-1) + 1}} &= \mathcal{O}\left(\sqrt{T\log(T/\delta)}\right) \quad \text{w.p} \quad 1-\delta\\
-    \sum_{t\leq T}\frac{\p(A_t=z|a_{1:t-1})}{n_z(t-1) + 1} &= \mathcal{O}\left(\log T\log(T/\delta)\right) \quad \text{w.p} \quad 1-\delta
+    \sum_{t\leq T}\frac{\p(A_t=z|a_{1:t-1})}{n_z(t-1) + 1} &\leq \frac{\log(T/\delta)}{3-e} \quad \text{w.p} \quad 1-\delta
 \end{align*}
 $$
 >
@@ -552,6 +552,56 @@ $\square$
 </div>
 
 
+<blockquote>
+We have this Freedman-style inequality [^lykouris2018]
+Let $X_1, \ldots, X_T$ be a sequence of real-valued random numbers.
+Assume, for all $t$, that $X_t \leq R$ and that $\mathbb{E}[X_t \mid X_1, \ldots, X_{t-1}] = 0$. Also let
+\[
+V = \sum_{t=1}^{T} \mathbb{E}[X_t^2 \mid X_1, \ldots, X_{t-1}].
+\]
+Then, for any $\delta > 0$ and $\lambda \geq 1$:
+\[
+\sum_{t=1}^{T} X_t < \lambda R \ln(1/\delta) + \frac{e-2}{R\lambda} \cdot V\quad\text{w.p.}\quad 1-\delta
+\]
+</blockquote>
+
+Thus in a similar fashion, we can set
+
+$$X_t = \frac{\p(A_t=z|\mathcal{F}_{t-1}) - I(A_t=z)}{n_z(t-1) + 1} < 1 = R.$$
+
+For simplicity, let
+
+$$
+\begin{align*}
+    E &= \sum_{t\leq T} \frac{\p(A_t=z|\mathcal{F}_{t-1})}{n_z(t-1) + 1}\\
+    Y &= \sum_{t\leq T} \frac{I(A_t=z)}{n_z(t-1) + 1} \leq \log(T)
+\end{align*}
+$$
+
+Then the pathwise variance sum can be bounded as:
+$$
+\begin{align*}
+    V &= \sum_{t=1}^T \mathbb{E}_t[X_t^2]\\
+    &= \sum_{t=1}^T\frac{\p(A_t=z|\mathcal{F}_{t-1})\left(1-\p(A_t=z|\mathcal{F}_{t-1})\right)}{(n_z(t-1) + 1)^2}\\
+    &\leq \sum_{t=1}^T \frac{\p(A_t=z|\mathcal{F}_{t-1})}{n_z(t-1) + 1}\\
+    &= E
+\end{align*}
+$$
+
+
+Plug into the above bounds with $R=\lambda=1$:
+
+$$
+\begin{align*}
+    \sum_{t\leq T} \frac{\p(A_t=z|\mathcal{F}_{t-1}) - I(A_t=z)}{n_z(t-1) + 1} &\leq \ln(1/\delta) + (e-2) \cdot V\quad\text{w.p.}\quad 1-\delta\\
+    E - Y &\leq \ln(1/\delta) + (e-2) \cdot E\quad\text{w.p.}\quad 1-\delta\\
+    \implies E &\leq \frac{\ln(1/\delta) + \ln T}{3-e},
+\end{align*}
+$$
+and this finishes the proof.
+<div style="text-align:right">
+$\square$
+</div>
 </p>
 
 ## Conclusion
@@ -567,3 +617,5 @@ This post develops the background about an important problem that I came across 
 [^beygelzimer2011]: Alina Beygelzimer, John Langford, Lihong Li, Lev Reyzin, and Robert E. Schapire. “Contextual bandit algorithms with supervised learning guarantees.” Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics. JMLR Workshop and Conference Proceedings, 2011.
 
 [^stocadv]: Lykouris, T., Mirrokni, V., & Paes Leme, R. (2018). Stochastic bandits robust to adversarial corruptions. In Proceedings of the 50th Annual ACM SIGACT Symposium on Theory of Computing (pp. 114–122). ACM. [https://doi.org/10.1145/3188745.3188918](https://doi.org/10.1145/3188745.3188918)
+
+[^lykouris2018]: Lykouris, T., Mirrokni, V., & Paes Leme, R. (2018). Stochastic Bandits Robust to Adversarial Corruptions. In *Proceedings of the 50th Annual ACM SIGACT Symposium on Theory of Computing (STOC '18)* (pp. 114–122). ACM.
