@@ -6,7 +6,30 @@ tags: [differential-privacy, statistics]
 math: true
 ---
 
-(Coming soon)
+Differential Privacy (DP) is a property of any randomized algorithm that takes a database with every row corresponding to one user's data as input. The extent of privacy is governed by the extent to which output distribution can change when one user's data is replaced or omitted.
+
+<div style="display:none">
+$$\newcommand{\p}{\mathcal{P}}$$
+$$\newcommand{\coloneqq}{:=}$$
+$$\newcommand{\I}{\mathbb{1}}$$
+$$\newcommand{\E}{\mathbb{E}}$$
+</div>
+
+Suppose every row in a database is an element of $\mathcal{X}$. A database with $T$ rows is an element of $\mathcal{X}^T$. Two databases $D, D^\prime \in \mathcal{X}^T$ are called neighboring if and only if they differ at exactly one row $t \in [T]$. Suppose a randomized algorithm $\mathcal{A}$ uses this database $D$ and we can sample outputs $y$ from this distribution:
+
+$$y \sim \mathcal{A}(D), \quad y \in \Omega$$
+
+Although we observe outcomes, we are only interested to talk about events $E \in \mathcal{F}$, the sigma algebra corresponding to the sample space $\Omega$, anyway. So, naturally an algorithm $\mathcal{A}$, would usually behave differently when the input database is $D^\prime$ instead. In general, $\mathcal{A}(D) \neq \mathcal{A}(D^\prime)$. However, if these distributions are too different from each other, an attacker from interacting with the algorithm could theoretically distinguish between these two databases from a given outcome by comparing how likely it came from either $\mathcal{A}(D)$ or $\mathcal{A}(D^\prime)$.
+
+
+>A randomized algorithm $\mathcal{A} : \mathcal{X}^T \rightarrow \Omega$ is $(\epsilon,\delta)$-DP if and only if, for every pair of neighboring databases $D,D^\prime \in \mathcal{X}^T$ and every event $E \in \mathcal{F}$, we have
+>
+> $$\p(\mathcal{A}(D) \in E) \leq e^\epsilon\;\p(\mathcal{A}(D^\prime) \in E) + \delta$$
+{: .prompt-tip}
+
+
+
+
 
 
 <!-- ## Motivation
